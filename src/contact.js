@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -6,6 +7,7 @@ import Button from "@material-ui/core/Button";
 import { Typography } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles((theme) => ({
   background: {
@@ -59,6 +61,8 @@ export default function Contact(props) {
 
   const [open, setOpen] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   const onChange = (event) => {
     let valid;
 
@@ -95,6 +99,26 @@ export default function Contact(props) {
   const handleClose = (value) => {
     setOpen(false);
   };
+
+  const onConfirm = () => {
+    setLoading(true);
+
+    axios
+      .get(
+        "https://console.firebase.google.com/u/0/project/material-react-5b120/functions"
+      )
+      .then((res) => {
+        setLoading(false);
+        setOpen(false);
+        setName("");
+        setEmail("");
+        setPhone("");
+        setMessage("");
+      })
+      .catch((err) => setLoading(false));
+  };
+
+  const buttonContents = <React.Fragment>Send</React.Fragment>;
 
   return (
     <Grid
@@ -156,9 +180,13 @@ export default function Contact(props) {
                 phoneHelper.length !== 0 ||
                 emailHelper.length !== 0
               }
-              onClick={() => setOpen(true)}
+              onClick={onConfirm}
             >
-              Send
+              {loading ? (
+                <CircularProgress size={30}></CircularProgress>
+              ) : (
+                buttonContents
+              )}
             </Button>
           </Grid>
         </Grid>
